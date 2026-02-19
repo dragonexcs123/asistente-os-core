@@ -1,0 +1,9 @@
+{
+    "version": "1.0.0",
+    "files": [
+        "main.py",
+        "intents.py",
+        "actions.py",
+        "utils.py"
+    ]
+}
