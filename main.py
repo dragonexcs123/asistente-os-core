@@ -4,7 +4,6 @@ from actions import crear_carpeta, cambiar_fondo
 # ==============================
 # UTILIDADES
 # ==============================
-
 def limpiar_pantalla():
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -14,7 +13,6 @@ def pausar():
 # ==============================
 # BUSQUEDA DE IMAGEN
 # ==============================
-
 def buscar_imagen(nombre_archivo, carpetas=None):
     """
     Busca un archivo por nombre en las carpetas indicadas.
@@ -29,19 +27,16 @@ def buscar_imagen(nombre_archivo, carpetas=None):
         ]
 
     encontrados = []
-
     for carpeta in carpetas:
         for root, dirs, files in os.walk(carpeta):
             for file in files:
                 if file.lower() == nombre_archivo.lower():
                     encontrados.append(os.path.join(root, file))
-
     return encontrados
 
 # ==============================
 # MENÚ PRINCIPAL
 # ==============================
-
 def mostrar_menu():
     limpiar_pantalla()
     print("=================================")
@@ -55,18 +50,41 @@ def mostrar_menu():
 # ==============================
 # OPCIONES
 # ==============================
-
 def opcion_crear_carpeta():
     limpiar_pantalla()
     print("📁 CREAR CARPETA")
     print("---------------------------------")
 
     nombre = input("Escribe el nombre de la nueva carpeta: ").strip()
-    if nombre:
-        crear_carpeta(nombre)
-    else:
+    if not nombre:
         print("❌ Nombre inválido.")
+        pausar()
+        return
 
+    ruta_input = input("Escribe la ubicación o nombre de carpeta especial (Ej: Descargas, Escritorio, C:\\RutaCompleta, Joseluis): ").strip()
+    user = os.getlogin()
+    ruta_destino = None
+
+    # Carpetas especiales
+    especiales = {
+        "escritorio": f"C:\\Users\\{user}\\Desktop",
+        "documentos": f"C:\\Users\\{user}\\Documents",
+        "descargas": f"C:\\Users\\{user}\\Downloads"
+    }
+
+    if ruta_input.lower() in especiales:
+        ruta_destino = especiales[ruta_input.lower()]
+    elif os.path.isabs(ruta_input):
+        ruta_destino = ruta_input
+    else:
+        posible_ruta = os.path.join(f"C:\\Users\\{user}", ruta_input)
+        if os.path.isdir(posible_ruta):
+            ruta_destino = posible_ruta
+        else:
+            # Si no existe, crear dentro de Documents por defecto
+            ruta_destino = f"C:\\Users\\{user}\\Documents"
+
+    crear_carpeta(nombre, ruta_destino)
     pausar()
 
 def opcion_cambiar_fondo():
@@ -102,7 +120,6 @@ def opcion_cambiar_fondo():
 # ==============================
 # LOOP PRINCIPAL
 # ==============================
-
 def ejecutar():
     while True:
         mostrar_menu()
