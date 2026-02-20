@@ -1,13 +1,18 @@
 # intents.py
 from rapidfuzz import fuzz
 from utils import normalizar
-
 INTENCIONES = {
     "crear_carpeta": [
         "crear carpeta",
         "haz una carpeta",
         "nueva carpeta",
         "crea carpeta"
+    ],
+    "cambiar_fondo": [
+        "cambiar fondo",
+        "poner fondo",
+        "cambia el fondo",
+        "poner fondo de pantalla"
     ],
     "salir": [
         "salir",
@@ -16,6 +21,7 @@ INTENCIONES = {
         "adios"
     ]
 }
+
 
 def detectar_intencion(texto):
     texto = normalizar(texto)
@@ -43,5 +49,13 @@ def extraer_nombre_carpeta(texto):
         indice = palabras.index("carpeta")
         if indice + 1 < len(palabras):
             return palabras[indice + 1]
+
+    return None
+def extraer_ruta_imagen(texto):
+    palabras = texto.split()
+
+    for palabra in palabras:
+        if palabra.endswith((".jpg", ".png", ".jpeg")):
+            return palabra
 
     return None
