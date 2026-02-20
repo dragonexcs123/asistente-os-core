@@ -1,6 +1,39 @@
 import os
 import ctypes
+from intents import detectar_intencion, extraer_nombre_carpeta
 
+def ejecutar_comando_ia():
+    limpiar_pantalla()
+    print("🤖 Modo IA activado")
+    comando = input("Dime qué quieres hacer: ").strip()
+
+    intencion = detectar_intencion(comando)
+
+    if intencion == "crear_carpeta":
+        nombre, destino = extraer_nombre_carpeta(comando)
+        if nombre:
+            if not destino:
+                destino = ""
+            crear_carpeta(nombre, destino)
+        else:
+            print("❌ No entendí el nombre de la carpeta")
+
+    elif intencion == "cambiar_fondo":
+        # Extraemos el nombre del archivo
+        palabras = comando.split()
+        archivo = palabras[-1]  # asumimos que la última palabra es el archivo
+        resultados = buscar_imagen(archivo)
+        if resultados:
+            cambiar_fondo(resultados[0])
+        else:
+            print("❌ No encontré la imagen")
+
+    elif intencion == "abrir_carpeta":
+        print("Funcionalidad de abrir carpeta aún no implementada")
+    else:
+        print("❌ No entendí el comando")
+    
+    pausar()
 # ==========================
 # FUNCIONES
 # ==========================
@@ -158,6 +191,7 @@ def mostrar_menu():
     print("1. Crear carpeta")
     print("2. Cambiar fondo de pantalla")
     print("3. Salir")
+    print("4. Comando de IA")
     print("=================================")
 
 def ejecutar():
@@ -170,6 +204,9 @@ def ejecutar():
             opcion_cambiar_fondo()
         elif opcion == "3":
             print("\n👋 Cerrando asistente...")
+            break
+        elif opcion == "4":
+            ejecutar_comando_ia()
             break
         else:
             print("❌ Opción inválida")
