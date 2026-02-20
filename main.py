@@ -5,11 +5,7 @@ from intents import detectar_intencion, extraer_nombre_carpeta
 
 from gpt4all import GPT4All
 
-# ==========================
-# Inicializar modelo GPT4All
-# ==========================
-modelo = GPT4All("models/ggml-gpt4all-l13b-snoozy.bin")  # ruta al .bin del modelo
-
+modelo = GPT4All("models/GPT4All-13B-snoozy.ggmlv3.q3_K_S.bin")
 def interpretar_comando(texto_usuario):
     prompt = f"""
 Eres un asistente de Windows. Interpreta el siguiente texto en una acción concreta.
