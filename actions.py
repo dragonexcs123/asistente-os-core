@@ -1,16 +1,24 @@
 import os
 import ctypes
 
-def crear_carpeta(nombre, ruta_destino=None):
-    if ruta_destino:
-        ruta_completa = os.path.join(ruta_destino, nombre)
-    else:
-        ruta_completa = os.path.join(os.getcwd(), nombre)
-    try:
-        os.makedirs(ruta_completa, exist_ok=True)
-        print(f"✅ Carpeta '{nombre}' creada correctamente en '{ruta_completa}'")
-    except Exception as e:
-        print(f"❌ Error al crear carpeta: {e}")
+def buscar_carpeta_por_nombre(nombre_carpeta, carpetas_iniciales=None):
+    """
+    Busca carpetas con el nombre indicado en todo el disco (o en carpetas iniciales)
+    Devuelve una lista de rutas encontradas
+    """
+    if carpetas_iniciales is None:
+        # Por defecto busca en las unidades comunes (C:\)
+        carpetas_iniciales = ["C:\\"]
+
+    encontrados = []
+
+    for inicio in carpetas_iniciales:
+        for root, dirs, files in os.walk(inicio):
+            for d in dirs:
+                if d.lower() == nombre_carpeta.lower():
+                    encontrados.append(os.path.join(root, d))
+
+    return encontrados
 
 def cambiar_fondo(ruta_imagen):
     if not os.path.isfile(ruta_imagen):

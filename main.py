@@ -1,6 +1,23 @@
 import os
 from actions import crear_carpeta, cambiar_fondo
 
+def buscar_carpeta_por_nombre(nombre_carpeta, carpetas_iniciales=None):
+    """
+    Busca carpetas con el nombre indicado en todo el disco (o en carpetas iniciales)
+    Devuelve una lista de rutas encontradas
+    """
+    if carpetas_iniciales is None:
+        carpetas_iniciales = ["C:\\Users"]  # buscar solo en C:\Users para acelerar
+
+    encontrados = []
+
+    for inicio in carpetas_iniciales:
+        for root, dirs, files in os.walk(inicio):
+            for d in dirs:
+                if d.lower() == nombre_carpeta.lower():
+                    encontrados.append(os.path.join(root, d))
+
+    return encontrados
 # ==============================
 # UTILIDADES
 # ==============================
@@ -55,13 +72,13 @@ def opcion_crear_carpeta():
     print("📁 CREAR CARPETA")
     print("---------------------------------")
 
-    nombre = input("Escribe el nombre de la nueva carpeta: ").strip()
-    if not nombre:
+    nombre_nueva = input("Escribe el nombre de la nueva carpeta: ").strip()
+    if not nombre_nueva:
         print("❌ Nombre inválido.")
         pausar()
         return
 
-    ruta_input = input("Escribe la ubicación o nombre de carpeta especial (Ej: Descargas, Escritorio, C:\\RutaCompleta, Joseluis): ").strip()
+    ubicacion = input("Escribe la carpeta donde quieres crearla (ej: HTML2, Descargas, Escritorio) o deja vacío: ").strip()
     user = os.getlogin()
     ruta_destino = None
 
@@ -72,19 +89,33 @@ def opcion_crear_carpeta():
         "descargas": f"C:\\Users\\{user}\\Downloads"
     }
 
-    if ruta_input.lower() in especiales:
-        ruta_destino = especiales[ruta_input.lower()]
-    elif os.path.isabs(ruta_input):
-        ruta_destino = ruta_input
+    if not ubicacion:
+        ruta_destino = os.getcwd()
+    elif ubicacion.lower() in especiales:
+        ruta_destino = especiales[ubicacion.lower()]
+    elif os.path.isabs(ubicacion):
+        ruta_destino = ubicacion
     else:
-        posible_ruta = os.path.join(f"C:\\Users\\{user}", ruta_input)
-        if os.path.isdir(posible_ruta):
-            ruta_destino = posible_ruta
+        # Buscar carpeta por nombre en todo el disco (puede tardar un poco)
+        print(f"🔍 Buscando carpeta '{ubicacion}' en el disco...")
+        resultados = buscar_carpeta_por_nombre(ubicacion)
+        if len(resultados) == 0:
+            print("❌ No se encontró la carpeta, se creará en la carpeta actual")
+            ruta_destino = os.getcwd()
+        elif len(resultados) == 1:
+            ruta_destino = resultados[0]
         else:
-            # Si no existe, crear dentro de Documents por defecto
-            ruta_destino = f"C:\\Users\\{user}\\Documents"
+            print("Se encontraron varias carpetas:")
+            for i, r in enumerate(resultados):
+                print(f"{i+1}. {r}")
+            opcion = input("Elige el número de la carpeta donde crear la nueva: ").strip()
+            if opcion.isdigit() and 1 <= int(opcion) <= len(resultados):
+                ruta_destino = resultados[int(opcion)-1]
+            else:
+                print("❌ Opción inválida, se creará en la carpeta actual")
+                ruta_destino = os.getcwd()
 
-    crear_carpeta(nombre, ruta_destino)
+    crear_carpeta(nombre_nueva, ruta_destino)
     pausar()
 
 def opcion_cambiar_fondo():
